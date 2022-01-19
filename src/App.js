@@ -7,6 +7,8 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Particles from "react-tsparticles";
 import React from 'react';
 import Clarifai from 'clarifai';
+import Signin from './components/Signin/Signin';
+import Register from './components/Register/Register';
 
 const particleOptions = {
   background: {
@@ -75,6 +77,8 @@ class App extends React.Component {
       input: '',
       imageUrl: '',
       boxes: [],
+      route: 'signin',
+      isSignedIn: false
     }
   }
 
@@ -118,19 +122,37 @@ class App extends React.Component {
       .catch(err => console.log(err));
   }
 
+  onRouteChange = (route) => {
+    this.setState({route: route});
+    if (route === 'signout') {
+      this.setState({isSignedIn: false})
+    } else if (route === 'home') {
+      this.setState({isSignedIn: true})
+    }
+  }
+
   render() {
     return (
       <div className="App">
         <Particles
           id="tsparticles"
           options={particleOptions}/>
-        <Navigation />
-        <Logo />
-        <Rank />
-        <ImageLinkForm
-          onButtonSubmit={this.onButtonSubmit}
-          onInputChange={this.onInputChange}/>
-        <FaceRecognition imageUrl={this.state.imageUrl} boxes={this.state.boxes} />
+        <Navigation isSignedIn={this.state.isSignedIn} onRouteChange={this.onRouteChange}/>
+        { this.state.route === 'home'
+          ? <div>
+            <Logo />
+            <Rank />
+            <ImageLinkForm
+              onButtonSubmit={this.onButtonSubmit}
+              onInputChange={this.onInputChange}/>
+            <FaceRecognition imageUrl={this.state.imageUrl} boxes={this.state.boxes} />
+          </div>
+          : (
+            this.state.route === 'signin'
+            ? <Signin onRouteChange={this.onRouteChange}/>
+            : <Register onRouteChange={this.onRouteChange} />
+          )
+        }
       </div>
     );
   }
