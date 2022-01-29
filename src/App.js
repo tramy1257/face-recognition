@@ -78,7 +78,14 @@ class App extends React.Component {
       imageUrl: '',
       boxes: [],
       route: 'signin',
-      isSignedIn: false
+      isSignedIn: false,
+      user: {
+        email: '',
+        name: '',
+        id: '',
+        entries: 0,
+        joined: ''
+      }
     }
   }
 
@@ -109,6 +116,16 @@ class App extends React.Component {
     this.setState({boxes: boxes});
   }
 
+  loadUser = (data) => {
+    this.setState({ user: {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        entries: data.entries,
+        joined: data.joined
+      } });
+  }
+
   onInputChange = (event) => {
     console.log(event.target.value);
     this.setState({input: event.target.value});
@@ -117,9 +134,24 @@ class App extends React.Component {
   onButtonSubmit = () => {
     console.log('click');
     this.setState({ imageUrl: this.state.input })
+
     app.models.predict("a403429f2ddf4b49b307e318f00e528b", this.state.input)
-      .then(response => this.displayFaceBox(this.calcFaceLocation(response)))
-      .catch(err => console.log(err));
+    .then(response => {
+      this.displayFaceBox(this.calcFaceLocation(response))
+      fetch('http://localhost:2000/image', {
+          method: "put",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            id: this.state.user.id
+          })
+      })
+      .then(response => response.json())
+      .then(newEntries => {
+        this.setState(Object.assign(this.state.user, { entries: newEntries }));
+      })
+    })
+
+    .catch(err => console.log(err));
   }
 
   onRouteChange = (route) => {
@@ -141,7 +173,7 @@ class App extends React.Component {
         { this.state.route === 'home'
           ? <div>
             <Logo />
-            <Rank />
+            <Rank name={this.state.user.name} entries={this.state.user.entries}/>
             <ImageLinkForm
               onButtonSubmit={this.onButtonSubmit}
               onInputChange={this.onInputChange}/>
@@ -149,8 +181,8 @@ class App extends React.Component {
           </div>
           : (
             this.state.route === 'signin'
-            ? <Signin onRouteChange={this.onRouteChange}/>
-            : <Register onRouteChange={this.onRouteChange} />
+            ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+            : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
           )
         }
       </div>
