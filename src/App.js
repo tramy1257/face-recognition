@@ -6,7 +6,6 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Particles from "react-tsparticles";
 import React from 'react';
-import Clarifai from 'clarifai';
 import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
 
@@ -65,10 +64,6 @@ const particleOptions = {
   },
   detectRetina: true,
 }
-
-const app = new Clarifai.App({
- apiKey: '39251ca5e78649c08c2dad1cd10abd9d'
-});
 
 const defaultState = {
     input: '',
@@ -149,10 +144,14 @@ class App extends React.Component {
   }
 
   onButtonSubmit = () => {
-    console.log('click');
     this.setState({ imageUrl: this.state.input })
 
-    app.models.predict("a403429f2ddf4b49b307e318f00e528b", this.state.input)
+    fetch('http://localhost:2000/imageurl', {
+      method: "post",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({input: this.state.input})
+    })
+    .then(response => response.json())
     .then(response => {
       this.displayFaceBox(this.calcFaceLocation(response))
       fetch('http://localhost:2000/image', {
