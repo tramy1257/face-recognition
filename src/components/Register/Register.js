@@ -1,5 +1,6 @@
 import React from 'react';
 import 'tachyons';
+import { API_PATH } from '../../config.js';
 
 class Register extends React.Component {
   constructor(props) {
@@ -24,7 +25,7 @@ class Register extends React.Component {
   }
 
   onSubmitRegister = (event) => {
-    fetch('http://localhost:2000/register', {
+    fetch(`${API_PATH}/register`, {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({

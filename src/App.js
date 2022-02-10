@@ -8,6 +8,7 @@ import Particles from "react-tsparticles";
 import React from 'react';
 import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
+import { API_PATH } from './config';
 
 const particleOptions = {
   background: {
@@ -146,7 +147,7 @@ class App extends React.Component {
   onButtonSubmit = () => {
     this.setState({ imageUrl: this.state.input })
 
-    fetch('http://localhost:2000/imageurl', {
+    fetch(`${API_PATH}/imageurl`, {
       method: "post",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({input: this.state.input})
@@ -154,7 +155,7 @@ class App extends React.Component {
     .then(response => response.json())
     .then(response => {
       this.displayFaceBox(this.calcFaceLocation(response))
-      fetch('http://localhost:2000/image', {
+      fetch(`${API_PATH}/image`, {
           method: "put",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({

@@ -1,5 +1,6 @@
 import React from 'react';
 import 'tachyons';
+import { API_PATH } from '../../config.js';
 
 class Signin extends React.Component {
   constructor(props) {
@@ -19,7 +20,7 @@ class Signin extends React.Component {
   }
 
   onSubmitSignin = () => {
-    fetch('http://localhost:2000/signin', {
+    fetch(`${API_PATH}/signin`, {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
